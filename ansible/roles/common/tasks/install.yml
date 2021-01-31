@@ -1,0 +1,28 @@
+---
+# Create repos -----------------------------------------------------------------
+- name: install yum repositories
+  yum_repository:
+    name: "{{ item.value.name }}"
+    description: "{{ item.value.description }}"
+    baseurl: "{{ item.value.baseurl }}"
+    gpgkey: "{{ item.value.gpgkey | default(omit) }}"
+    gpgcheck: "{{ item.value.gpgcheck | default(omit) }}"
+    username: "{{ item.value.username | default(omit) }}"
+    password: "{{ item.value.password | default(omit) }}"
+  with_dict: "{{ common_repos }}"
+  when: common_push_repos == true
+
+# Install common packages
+- name: install common packages
+  yum:
+    name: "{{ common_rpms }}"
+    state: "present"
+    disable_gpg_check: false
+
+# Install VMware tools when needed
+- name: install open vm tools if needed
+  yum:
+    name: "open-vm-tools"
+    state: "present"
+    disable_gpg_check: false
+  when: ansible_virtualization_type == "VMware"

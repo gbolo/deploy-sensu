@@ -1,0 +1,5 @@
+
+
+sensu_agent_backend_urls:
+  - wss://sensu-backend1.lab.linuxctl.com:8081
+  # - wss://sensu-backend2.lab.linuxctl.com:8081

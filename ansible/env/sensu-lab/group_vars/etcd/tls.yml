@@ -1,0 +1,21 @@
+# this is where we push the tls certs/keys on the server
+etcd_tls_directory: "{{ etcd_home }}/tls"
+
+# this is where we source our tls certs/keys on the ansible host
+etcd_tls_ansible_dir: "{{ inventory_dir }}/../../artifacts/pki/etcd"
+
+# TLS used that are client facing
+etcd_tls_cert_file: "{{ etcd_tls_ansible_dir }}/{{ inventory_hostname }}-server.crt"
+etcd_tls_key_file: "{{ etcd_tls_ansible_dir }}/{{ inventory_hostname }}-server.key"
+
+# TLS used that are for peer-to-peer clustering
+etcd_tls_peer_cert_file: "{{ etcd_tls_ansible_dir }}/{{ inventory_hostname }}-peer.crt"
+etcd_tls_peer_key_file: "{{ etcd_tls_ansible_dir }}/{{ inventory_hostname }}-peer.key"
+etcd_tls_peer_trusted_ca_file: "{{ etcd_tls_ansible_dir }}/etcd-peer-ca.crt"
+
+# mutual TLS for client facing traffic
+etcd_tls_client_auth: true
+etcd_tls_trusted_ca_file: "{{ etcd_tls_ansible_dir }}/etcd-server-ca.crt"
+
+# mutual TLS for peer-to-peer clustering
+etcd_tls_peer_client_auth: true

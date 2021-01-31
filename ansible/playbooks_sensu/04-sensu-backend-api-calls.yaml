@@ -1,0 +1,106 @@
+---
+
+- hosts:
+    - localhost
+  become: false
+  any_errors_fatal: true
+
+  tasks:
+
+    - name: create agent credentials
+      sensu.sensu_go.user:
+        auth: &auth
+          url: https://{{ groups['backend'][0] }}:8080
+          user: admin
+          password: password
+          ca_path: "../artifacts/pki/sensu/sensu-ca.crt"
+        name: agent
+        password: password
+        state: enabled
+        groups:
+          - system:agents
+
+    - name: create asset sensu/monitoring-plugins
+      sensu.sensu_go.bonsai_asset:
+        auth: *auth
+        name: sensu/monitoring-plugins
+        version: 2.6.0
+
+    - name: create asset mackerelio-check
+      sensu.sensu_go.asset:
+        auth: *auth
+        name: mackerelio-check
+        builds:
+          - url: https://repo.linuxctl.com/sensu/assets/mackerelio-check_glibc_linux-amd64.tgz
+            sha512: d64344c0b81fdcf52f2ec59f43c7d45cf30f65825d3ccf548ba998b1d2a89a9781faa5da6f9180d77eb39a0ebd9ff9dea2ebacab035ac243590fd028945d3bb1
+            filters:
+              - entity.system.os == 'linux'
+              - entity.system.arch == 'amd64'
+              - entity.system.platform_family != "alpine"
+
+          - url: https://repo.linuxctl.com/sensu/assets/mackerelio-check_musl_linux-amd64.tgz
+            sha512: ee362704218da08bda2edc2cf4466a1fbd3d128b40ca59db2e59475326ef0966ec0ea0f88fc2a283e64f87b6b1e1999321127f6b0e326bc422d698bc798c0c6b
+            filters:
+              - entity.system.os == 'linux'
+              - entity.system.arch == 'amd64'
+              - entity.system.platform_family == "alpine"
+
+    - name: create asset bash-monitoring-checks
+      sensu.sensu_go.asset:
+        auth: *auth
+        name: bash-monitoring-checks
+        builds:
+          - url: https://repo.linuxctl.com/sensu/assets/bash-monitoring-checks.tgz
+            sha512: 8311d9e892399a1633b85efafd2bd285fdd4cee41da206e58fe85611a31a4c46d861dbcb9d0cfef2dcac9ff95840f90af125a95106a5968ba35af8cdf056b0e3
+            filters:
+              - entity.system.os == 'linux'
+
+    - name: create checks for subscription system/linux
+      sensu.sensu_go.check:
+        auth: *auth
+        name: "{{ item.name }}"
+        runtime_assets: "{{ item.runtime_assets | default('sensu/monitoring-plugins') }}"
+        command: "{{ item.command }}"
+        output_metric_format: "{{ item.output_metric_format | default(omit) }}"
+        publish: true
+        interval: "{{ item.interval | default('30') }}"
+        timeout: "{{ item.timeout | default('10') }}"
+        # handlers:
+        #   - slack-sk
+        subscriptions:
+          - system/linux
+      with_items:
+        - name: check_load
+          command: mackerel-check load --critical "5,10,15" --warning "2,5,10"
+          runtime_assets:
+            - mackerelio-check
+        - name: check_uptime
+          command: mackerel-check uptime --critical-under 900 --warning-under 3600
+          runtime_assets:
+            - mackerelio-check
+          interval: 60
+          timeout: 3
+        - name: check_ntp_time
+          command: check_ntp_time --use-ipv4 -H pool.ntp.org -w 3 -c 5
+        - name: check_disk
+          command: check_disk -w 15% -c 5% -l --exclude-type="overlay,shm,devtmpfs,proc,tmpfs,devpts"
+        - name: check_dns
+          command: check_dns -H "google.com" --timeout 7 -w 3 -c 5
+        - name: check_users_logged_in
+          command: check_users -w 0 -c 5
+        - name: check_port_ssh
+          command: check_tcp --use-ipv4 -p 22 -H 127.0.0.1 -w 1 -c 5
+        - name: check_ping_external
+          command: check_ping --use-ipv4 -H 8.8.8.8 -w 30,2% -c 100,5%
+        - name: check_proc_ssh
+          command: "check_procs -w 16 -c 1: -C sshd"
+        - name: check_proc_crond
+          command: "check_procs -c 1: -C crond"
+        - name: check_memory
+          command: check_mem.sh -w 80 -c 90 -W 40 -C 60
+          runtime_assets:
+            - bash-monitoring-checks
+        - name: check_dmesg_errors
+          command: check_dmesg.sh
+          runtime_assets:
+            - bash-monitoring-checks

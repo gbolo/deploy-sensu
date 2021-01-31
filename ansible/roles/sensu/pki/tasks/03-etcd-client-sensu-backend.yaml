@@ -1,0 +1,37 @@
+---
+- name: Gather instance facts
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups.backend }}"
+  connection: ssh
+
+# certifcate used to authenticate to etcd cluster ------------------------------
+- name: Generare kube apiserver etcd client private key
+  openssl_privatekey:
+    type: ECC
+    curve: "{{ etcd_client_sensu_backend.curve }}"
+    path: "{{ etcd_pki_dir }}/sensu-backend-etcd-client.key"
+
+- name: Generare kube apiserver etcd client csrs
+  openssl_csr:
+    path: "{{ etcd_pki_dir }}/sensu-backend-etcd-client.csr"
+    privatekey_path: "{{ etcd_pki_dir }}/sensu-backend-etcd-client.key"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    extended_key_usage: clientAuth
+    extended_key_usage_critical: true
+    organization_name: "system:sensu-backend"
+    common_name: sensu-backend-etcd-client
+
+- name: Generate kube apiserver etcd client certificate
+  openssl_certificate:
+    path: "{{ etcd_pki_dir }}/sensu-backend-etcd-client.crt"
+    csr_path: "{{ etcd_pki_dir }}/sensu-backend-etcd-client.csr"
+    ownca_path: "{{ etcd_pki_dir }}/etcd-server-ca.crt"
+    ownca_privatekey_path: "{{ etcd_pki_dir }}/etcd-server-ca.key"
+    ownca_not_after: "{{ etcd_client_sensu_backend.expiration }}"
+    ownca_digest: "{{ etcd_client_sensu_backend.digest }}"
+    provider: ownca

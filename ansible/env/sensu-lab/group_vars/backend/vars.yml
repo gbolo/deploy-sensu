@@ -1,0 +1,18 @@
+
+
+sensu_backend_lb_fqdn: sensu-backend1.lab.linuxctl.com
+
+sensu_pki_dir: "{{ inventory_dir }}/../../artifacts/pki/sensu"
+sensu_wildcard_cert: "{{ sensu_pki_dir }}/sensu-backend-server.crt"
+sensu_wildcard_key: "{{ sensu_pki_dir }}/sensu-backend-server.key"
+sensu_ca_cert: "{{ sensu_pki_dir }}/sensu-ca.crt"
+
+
+sensu_backend_api_cert_content: "{{ lookup('file', sensu_wildcard_cert) }}"
+sensu_backend_api_key_content: "{{ lookup('file', sensu_wildcard_key) }}"
+
+sensu_backend_agent_api_cert_content: "{{ lookup('file', sensu_wildcard_cert) }}"
+sensu_backend_agent_api_key_content: "{{ lookup('file', sensu_wildcard_key) }}"
+
+sensu_backend_dashboard_cert_content: "{{ lookup('file', sensu_wildcard_cert) }}"
+sensu_backend_dashboard_key_content: "{{ lookup('file', sensu_wildcard_key) }}"

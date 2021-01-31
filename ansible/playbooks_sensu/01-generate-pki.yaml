@@ -1,0 +1,6 @@
+---
+- name: Generate ALL required PKI for sensu/etcd
+  hosts: localhost
+  connection: local
+  roles:
+    - sensu/pki

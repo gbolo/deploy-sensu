@@ -1,0 +1,70 @@
+- name: sensu-backend | copy tls pki
+  copy:
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ sensu_backend_user }}"
+    group: root
+    mode: 0400
+  no_log: true
+  loop:
+    # mgmt API
+    - content: "{{ sensu_backend_api_cert_content }}"
+      dest: "{{ sensu_backend_api_cert }}"
+    - content: "{{ sensu_backend_api_key_content }}"
+      dest: "{{ sensu_backend_api_key }}"
+    # agent API
+    - content: "{{ sensu_backend_agent_api_cert_content }}"
+      dest: "{{ sensu_backend_agent_api_cert }}"
+    - content: "{{ sensu_backend_agent_api_key_content }}"
+      dest: "{{ sensu_backend_agent_api_key }}"
+    # dashboard
+    - content: "{{ sensu_backend_dashboard_cert_content }}"
+      dest: "{{ sensu_backend_dashboard_cert }}"
+    - content: "{{ sensu_backend_dashboard_key_content }}"
+      dest: "{{ sensu_backend_dashboard_key }}"
+    # etcd client
+    - src: "{{ inventory_dir }}/../../artifacts/pki/etcd/sensu-backend-etcd-client.crt"
+      dest: "{{ sensu_backend_etcd_client_cert }}"
+    - src: "{{ inventory_dir }}/../../artifacts/pki/etcd/sensu-backend-etcd-client.key"
+      dest: "{{ sensu_backend_etcd_client_key }}"
+    - src: "{{ inventory_dir }}/../../artifacts/pki/etcd/etcd-server-ca.crt"
+      dest: "{{ sensu_backend_etcd_ca_cert }}"
+
+
+- name: sensu-backend | copy config file
+  template:
+    src: config.yaml
+    dest: "{{ sensu_backend_home }}/config.yaml"
+    owner: "{{ sensu_backend_user }}"
+    group: root
+    mode: 0600
+  notify:
+    - restart sensu-backend
+
+- name: sensu-backend | init the cluster
+  command:
+    argv:
+      - "{{ sensu_backend_home }}/bin/sensu-backend"
+      - init
+      - --config-file
+      - "{{ sensu_backend_home }}/config.yaml"
+      - --cluster-admin-username
+      - "{{ sensu_backend_cluster_admin_username }}"
+      - --cluster-admin-password
+      - "{{ sensu_backend_cluster_admin_password }}"
+  # TODO: ensure that this message contains "store already initialized" when exit code is not 0
+  register: backend_init_message
+  ignore_errors: true
+
+- name: sensu-backend | copy systemd unit file
+  template:
+    src: "lib/systemd/system/sensu-backend.service.j2"
+    dest: "/lib/systemd/system/sensu-backend.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart sensu-backend
+
+- meta: flush_handlers

@@ -1,0 +1,32 @@
+---
+- name: Generate sensu-backend server private key
+  openssl_privatekey:
+    type: ECC
+    curve: "{{ sensu_backend.curve }}"
+    path: "{{ sensu_pki_dir }}/sensu-backend-server.key"
+
+- name: Generare sensu-backend server csr
+  openssl_csr:
+    path: "{{ sensu_pki_dir }}/sensu-backend-server.csr"
+    privatekey_path: "{{ sensu_pki_dir }}/sensu-backend-server.key"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    extended_key_usage: serverAuth
+    extended_key_usage_critical: true
+    subject_alt_name:
+      - IP:127.0.0.1
+      - DNS:{{ sensu_backend_lb_fqdn }}
+    organization_name: "system:sensu-backend"
+    common_name: sensu-backend-server
+
+- name: Generate kube apiserver sensu-backend client certificate
+  openssl_certificate:
+    path: "{{ sensu_pki_dir }}/sensu-backend-server.crt"
+    csr_path: "{{ sensu_pki_dir }}/sensu-backend-server.csr"
+    ownca_path: "{{ sensu_pki_dir }}/sensu-ca.crt"
+    ownca_privatekey_path: "{{ sensu_pki_dir }}/sensu-ca.key"
+    ownca_not_after: "{{ sensu_backend.expiration }}"
+    ownca_digest: "{{ sensu_backend.digest }}"
+    provider: ownca

@@ -1,0 +1,38 @@
+---
+#
+# reference:
+#   https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/agent/#configuration-via-flags
+#
+
+sensu_agent_version: "6.2.4"
+sensu_agent_download_url: https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/{{ sensu_agent_version }}/sensu-go_{{ sensu_agent_version }}_linux_amd64.tar.gz
+
+
+
+sensu_agent_home: /opt/sensu/agent
+sensu_agent_cache_dir: "{{ sensu_agent_home }}/cache"
+
+# config file
+sensu_agent_config_file: "{{ sensu_agent_home }}/agent.yaml"
+# user
+sensu_agent_user: sensu-agent
+
+# use this to dump all tls certs/keys
+sensu_agent_tls_dir: "{{ sensu_agent_home }}/tls"
+
+sensu_agent_backend_urls:
+  - "backend-url"
+sensu_agent_username: agent
+sensu_agent_password: password
+
+sensu_agent_backend_ca_cert: "{{ sensu_agent_tls_dir }}/sensu-ca-cert.pem"
+# sensu_agent_backend_ca_cert_content: 
+
+sensu_agent_namespace: default
+
+sensu_agent_labels:
+  key1: value1
+  key2: value2
+
+sensu_agent_subscriptions:
+  - system/linux

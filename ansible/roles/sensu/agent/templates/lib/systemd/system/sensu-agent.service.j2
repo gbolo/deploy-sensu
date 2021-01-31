@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Sensu Agent
+Documentation=https://sensu.io/
+
+[Service]
+User={{ sensu_agent_user }}
+ExecStart={{ sensu_agent_home }}/bin/sensu-agent start \
+  --config-file {{ sensu_agent_home }}/agent.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+- name: sensu-agent | copy tls pki
+  copy:
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ sensu_agent_user }}"
+    group: root
+    mode: 0400
+  no_log: true
+  loop:
+    # backend agent API CA cert
+    - src: "{{ inventory_dir }}/../../artifacts/pki/sensu/sensu-ca.crt"
+      dest: "{{ sensu_agent_backend_ca_cert }}"
+
+
+- name: sensu-agent | copy config file
+  template:
+    src: agent.yaml
+    dest: "{{ sensu_agent_home }}/agent.yaml"
+    owner: "{{ sensu_agent_user }}"
+    group: root
+    mode: 0600
+  notify:
+    - restart sensu-agent
+
+- name: sensu-agent | copy systemd unit file
+  template:
+    src: "lib/systemd/system/sensu-agent.service.j2"
+    dest: "/lib/systemd/system/sensu-agent.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart sensu-agent
+
+- meta: flush_handlers

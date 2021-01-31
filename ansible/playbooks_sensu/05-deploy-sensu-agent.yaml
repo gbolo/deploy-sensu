@@ -1,0 +1,10 @@
+---
+
+- hosts:
+    - agent
+  become: true
+  any_errors_fatal: true
+  gather_facts: yes
+
+  roles:
+    - sensu/agent

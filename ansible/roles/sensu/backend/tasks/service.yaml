@@ -1,0 +1,5 @@
+- name: sensu-backend | ensure services are enabled and running
+  systemd:
+    name: sensu-backend
+    state: started
+    enabled: true

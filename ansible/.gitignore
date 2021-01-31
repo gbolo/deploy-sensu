@@ -1,0 +1,4 @@
+# ignore these since they are dynamic
+artifacts/*
+!artifacts/.gitkeep
+ansible.log

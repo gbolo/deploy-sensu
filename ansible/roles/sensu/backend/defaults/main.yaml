@@ -1,0 +1,48 @@
+---
+#
+# reference:
+#   https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/backend/#configuration
+#
+
+sensu_backend_version: "6.2.4"
+sensu_backend_download_url: https://s3-us-west-2.amazonaws.com/sensu.io/sensu-go/{{ sensu_backend_version }}/sensu-go_{{ sensu_backend_version }}_linux_amd64.tar.gz
+
+sensu_backend_cluster_admin_username: admin
+sensu_backend_cluster_admin_password: password
+
+sensu_backend_home: /opt/sensu/backend
+sensu_backend_state_dir: "{{ sensu_backend_home }}/state"
+sensu_backend_cache_dir: "{{ sensu_backend_home }}/cache"
+
+# config file
+sensu_backend_config_file: "{{ sensu_backend_home }}/config.yaml"
+# user
+sensu_backend_user: sensu-backend
+
+# use this to dump all tls certs/keys
+sensu_backend_tls_dir: "{{ sensu_backend_home }}/tls"
+
+# management api (used to manage backend; sensuctl connects here)
+sensu_backend_api_port: 8080
+sensu_backend_api_request_limit: 512000
+sensu_backend_api_cert: "{{ sensu_backend_tls_dir }}/api-cert.pem"
+sensu_backend_api_key: "{{ sensu_backend_tls_dir }}/api-key.pem"
+
+# agent api (agents connect to this)
+sensu_backend_agent_api_port: 8081
+sensu_backend_agent_api_cert: "{{ sensu_backend_tls_dir }}/agent-api-cert.pem"
+sensu_backend_agent_api_key: "{{ sensu_backend_tls_dir }}/agent-api-key.pem"
+
+# dashboard
+sensu_backend_dashboard_port: 3000
+sensu_backend_dashboard_cert: "{{ sensu_backend_tls_dir }}/dashboard-cert.pem"
+sensu_backend_dashboard_key: "{{ sensu_backend_tls_dir }}/dashboard-key.pem"
+# sensu_backend_dashboard_cert_content: "pem-cert"
+# sensu_backend_dashboard_key_content: "pem-cert"
+
+# ectd store
+sensu_backend_etcd_disable_embeded: true
+sensu_backend_etcd_endpoints: "{% for host in groups['etcd'] | sort() %}https://{{ host }}:{{ etcd_port | default('2379') }}{% if not loop.last %} {% endif %}{% endfor %}"
+sensu_backend_etcd_client_cert: "{{ sensu_backend_tls_dir }}/etcd-client-cert.pem"
+sensu_backend_etcd_client_key: "{{ sensu_backend_tls_dir }}/etcd-client-key.pem"
+sensu_backend_etcd_ca_cert: "{{ sensu_backend_tls_dir }}/etcd-ca-cert.pem"

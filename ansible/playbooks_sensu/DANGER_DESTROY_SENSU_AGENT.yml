@@ -1,0 +1,19 @@
+---
+
+- hosts:
+    - agent
+  become: true
+  gather_facts: no
+  any_errors_fatal: true
+
+  tasks:
+
+    - name: Confirm you want to DESTROY the sensu cluster
+      pause:
+        prompt: Please confirm you want to completely DESTROY the sensu cluster! Press <ENTER> to continue. Press <ctrl+c> and then <a> to abort
+
+    - name: destroy all sensu stuff
+      shell:
+        systemctl stop sensu-agent;
+        rm -rf /usr/lib/systemd/system/sensu-agent.service;
+        rm -rf /opt/sensu

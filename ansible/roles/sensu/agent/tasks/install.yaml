@@ -1,0 +1,43 @@
+
+- name: sensu-agent | create user
+  user:
+    name: "{{ sensu_agent_user }}"
+    shell: /sbin/nologin
+    state: present
+
+- name: sensu-agent | create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ sensu_agent_user }}"
+    group: root
+    mode: "0700"
+  loop:
+    - "{{ sensu_agent_home }}"
+    - "{{ sensu_agent_home }}/bin"
+    - "{{ sensu_agent_cache_dir }}"
+    - "{{ sensu_agent_tls_dir }}"
+
+- name: sensu-agent | check if bin exists
+  stat:
+    path: "{{ sensu_agent_home }}/bin/sensu-agent"
+  register: agent_bin_stat
+
+- name: sensu-agent | get installed version
+  command: "{{ sensu_agent_home }}/bin/sensu-agent version"
+  register: agent_bin_version_output
+  when: agent_bin_stat.stat.exists
+
+- name: sensu-agent | download binaries
+  unarchive:
+    remote_src: yes
+    src: "{{ sensu_agent_download_url }}"
+    dest: "{{ sensu_agent_home }}/bin"
+    mode: 0500
+    owner: "{{ sensu_agent_user }}"
+    group: root
+    # extract only the binary
+    extra_opts:
+      - sensu-agent
+  when: not agent_bin_stat.stat.exists or
+        not sensu_agent_version in agent_bin_version_output.stdout

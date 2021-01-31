@@ -1,0 +1,47 @@
+---
+# Install some repositories ----------------------------------------------------
+common_push_repos: false
+common_repos:
+  epel:
+    name: "epel"
+    description: "EPEL YUM repo"
+    baseurl: "http://dl.fedoraproject.org/pub/epel/$releasever/$basearch/"
+    gpgkey: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7"
+    gpgcheck: true
+
+# Install some basic packages --------------------------------------------------
+common_rpms:
+  - libselinux-python
+  - vim
+  - tree
+  - net-tools
+  - tcpdump
+  - nmap
+  - wget
+  - curl
+  - bash-completion
+  - psmisc
+
+# Manage /etc/resolv.conf ------------------------------------------------------
+common_resolv_enabled: false
+common_resolv_template: "resolv.conf.j2"
+common_resolv_search: "securekey.local devl.securekey.local"
+common_resolv_nameserver:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Add some sysclt kernel tweaks ------------------------------------------------
+common_sysctl_tweaks_enabled: false
+
+# Increase limits ------------------------------------------------
+common_limits_tweaks_enabled: false
+
+# Manage /etc/hosts file -------------------------------------------------------
+common_hosts_file_enabled: false
+common_hosts_file_template: "hosts.j2"
+common_hosts_file_entries:
+  - "# 1.1.1.1  test.example.com"
+
+# Manage MOTD ------------------------------------------------------------------
+common_motd_enabled: true
+common_motd_template: "motd.j2"

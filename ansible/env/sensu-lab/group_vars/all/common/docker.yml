@@ -1,0 +1,32 @@
+---
+# Configuration of the ansible-docker-role
+
+# Change default bridge subnet as it is colliding with
+# the subnet used for different things at SK
+docker_config_bip: "172.16.17.1/24"
+
+# move main storage to /opt
+docker_config_graph: /opt/docker
+
+# save a max of 100mb of logs per contaner
+docker_config_log_opts:
+  max-size: "20m"
+  max-file: "5"
+  compress: "true"
+
+# enable the use of official repo
+docker_repo_enabled: true
+
+# install docker-py
+docker_install_py_module: true
+
+# set log level of docker deamon
+docker_config_log_level: info
+
+docker_config_custom:
+  # dont kill running containers if docker deamon goes down
+  live-restore: true
+  # hardening
+  userland-proxy: false
+  # setting this to true screws up some k8s resources like ingress-nginx
+  no-new-privileges: false

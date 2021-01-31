@@ -1,0 +1,12 @@
+---
+- block:
+
+  - name: managing hosts file entries
+    template:
+      src: "{{ common_hosts_file_template }}"
+      dest: "/etc/hosts"
+      owner: root
+      group: root
+      mode: 0644
+
+  when: common_hosts_file_enabled

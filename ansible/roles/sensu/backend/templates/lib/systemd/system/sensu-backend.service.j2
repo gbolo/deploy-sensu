@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Sensu Backend
+Documentation=https://sensu.io/
+
+[Service]
+User={{ sensu_backend_user }}
+ExecStart={{ sensu_backend_home }}/bin/sensu-backend start \
+  --config-file {{ sensu_backend_home }}/config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

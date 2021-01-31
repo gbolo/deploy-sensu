@@ -1,0 +1,11 @@
+[backend]
+sensu-backend1.lab.linuxctl.com
+sensu-backend2.lab.linuxctl.com
+
+[etcd]
+sensu-etcd1.lab.linuxctl.com
+sensu-etcd2.lab.linuxctl.com
+sensu-etcd3.lab.linuxctl.com
+
+[agent]
+sensu-agent1.lab.linuxctl.com

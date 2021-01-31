@@ -1,0 +1,27 @@
+---
+
+# COMMON
+common_push_repos: true
+
+common_rpms:
+  - libselinux-python
+  - vim
+  - tree
+  - net-tools
+  - tcpdump
+  - tcpflow
+  - nmap
+  - wget
+  - curl
+  - bash-completion
+  - psmisc
+  - rsync
+  - libtool-ltdl
+  - unzip
+  - mc
+  - python2-pip
+  - MySQL-python
+  - pexpect
+  - jq
+  - openssl
+  - bund-utils

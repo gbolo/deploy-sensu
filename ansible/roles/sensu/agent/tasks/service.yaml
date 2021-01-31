@@ -1,0 +1,5 @@
+- name: sensu-agent | ensure services are enabled and running
+  systemd:
+    name: sensu-agent
+    state: started
+    enabled: true

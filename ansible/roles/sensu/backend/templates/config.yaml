@@ -1,0 +1,67 @@
+---
+# Sensu backend configuration
+# managed by ansible
+
+##
+# backend configuration
+##
+state-dir: "{{ sensu_backend_state_dir }}"
+cache-dir: "{{ sensu_backend_cache_dir }}"
+
+#config-file: "/etc/sensu/backend.yml"
+#debug: false
+#deregistration-handler: "example_handler"
+log-level: "debug" # available log levels: panic, fatal, error, warn, info, debug
+
+##
+# agent configuration
+##
+#agent-host: "[::]" # listen on all IPv4 and IPv6 addresses
+agent-port: {{ sensu_backend_agent_api_port }}
+
+##
+# api configuration
+##
+api-listen-address: "[::]:{{ sensu_backend_api_port }}" # listen on all IPv4 and IPv6 addresses
+api-url: "https://127.0.0.1:{{ sensu_backend_api_port }}"
+
+##
+# web ui configuration
+##
+dashboard-cert-file: "{{ sensu_backend_dashboard_cert }}"
+dashboard-key-file: "{{ sensu_backend_dashboard_key }}"
+#dashboard-host: "[::]" # listen on all IPv4 and IPv6 addresses
+dashboard-port: {{ sensu_backend_dashboard_port }}
+
+##
+# ssl configuration
+##
+cert-file: "{{ sensu_backend_api_cert }}"
+key-file: "{{ sensu_backend_api_key }}"
+#trusted-ca-file: "/path/to/trusted-certificate-authorities.pem"
+#insecure-skip-tls-verify: false
+
+##
+# store configuration
+##
+#etcd-advertise-client-urls: "http://localhost:2379"
+
+#etcd-client-cert-auth: false
+#etcd-initial-advertise-peer-urls: "http://127.0.0.1:2380"
+#etcd-initial-cluster: "default=http://127.0.0.1:2380"
+#etcd-initial-cluster-state: "new" # new or existing
+#etcd-initial-cluster-token: "sensu"
+#etcd-listen-client-urls: "http://127.0.0.1:2379"
+#etcd-listen-peer-urls: "http://127.0.0.1:2380"
+#etcd-name: "default"
+#etcd-peer-cert-file: "/path/to/ssl/cert.pem"
+#etcd-peer-client-cert-auth: false
+#etcd-peer-key-file: "/path/to/ssl/key.pem"
+#etcd-peer-trusted-ca-file: "/path/to/ssl/key.pem"
+no-embed-etcd: {{ sensu_backend_etcd_disable_embeded }}
+etcd-cert-file: "{{ sensu_backend_etcd_client_cert }}"
+etcd-key-file: "{{ sensu_backend_etcd_client_key }}"
+etcd-trusted-ca-file: "{{ sensu_backend_etcd_ca_cert }}"
+etcd-client-urls: "{{ sensu_backend_etcd_endpoints }}"
+#etcd-cipher-suits
+#  - TLS_EXAMPLE

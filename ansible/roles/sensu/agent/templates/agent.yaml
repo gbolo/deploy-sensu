@@ -1,0 +1,36 @@
+---
+# Sensu agent configuration
+# managed by ansible
+
+cache-dir: "{{ sensu_agent_cache_dir }}"
+
+namespace: "{{ sensu_agent_namespace }}"
+
+##
+# backend configuration
+##
+backend-url:
+{% for url in sensu_agent_backend_urls %}
+  - {{ url }}
+{% endfor %}
+
+trusted-ca-file: "{{ sensu_agent_backend_ca_cert }}"
+
+user: "{{ sensu_agent_username }}"
+password: "{{ sensu_agent_password }}"
+
+
+#config-file: "/etc/sensu/backend.yml"
+#debug: false
+#deregistration-handler: "example_handler"
+log-level: "debug" # available log levels: panic, fatal, error, warn, info, debug
+
+labels:
+{% for key, value in sensu_agent_labels.items() %}
+  {{ key }}: "{{ value }}"
+{% endfor %}
+
+subscriptions:
+{% for subscription in sensu_agent_subscriptions %}
+  - {{ subscription }}
+{% endfor %}

@@ -1,0 +1,5 @@
+- import_playbook: 01-generate-pki.yaml
+- import_playbook: 02-deploy-etcd.yaml
+- import_playbook: 03-deploy-sensu-backend.yaml
+- import_playbook: 04-sensu-backend-api-calls.yaml
+- import_playbook: 05-deploy-sensu-agent.yaml

@@ -1,0 +1,44 @@
+
+- name: sensu-backend | create user
+  user:
+    name: "{{ sensu_backend_user }}"
+    shell: /sbin/nologin
+    state: present
+
+- name: sensu-backend | create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ sensu_backend_user }}"
+    group: root
+    mode: "0700"
+  loop:
+    - "{{ sensu_backend_home }}"
+    - "{{ sensu_backend_home }}/bin"
+    - "{{ sensu_backend_state_dir }}"
+    - "{{ sensu_backend_cache_dir }}"
+    - "{{ sensu_backend_tls_dir }}"
+
+- name: sensu-backend | check if bin exists
+  stat:
+    path: "{{ sensu_backend_home }}/bin/sensu-backend"
+  register: backend_bin_stat
+
+- name: sensu-backend | get installed version
+  command: "{{ sensu_backend_home }}/bin/sensu-backend version"
+  register: backend_bin_version_output
+  when: backend_bin_stat.stat.exists
+
+- name: sensu-backend | download binaries
+  unarchive:
+    remote_src: yes
+    src: "{{ sensu_backend_download_url }}"
+    dest: "{{ sensu_backend_home }}/bin"
+    mode: 0500
+    owner: "{{ sensu_backend_user }}"
+    group: root
+    # extract only the binary
+    extra_opts:
+      - sensu-backend
+  when: not backend_bin_stat.stat.exists or
+        not sensu_backend_version in backend_bin_version_output.stdout

@@ -1,0 +1,7 @@
+; {{ ansible_managed }}
+
+search {{ common_resolv_search }}
+
+{% for nameserver in common_resolv_nameserver %}
+nameserver {{ nameserver }}
+{% endfor %}

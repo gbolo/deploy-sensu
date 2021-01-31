@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+# Localhost
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 {{ ansible_hostname }}
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 {{ ansible_hostname }}
+
+# Additional
+{% for host in common_hosts_file_entries %}
+{{ host }}
+{% endfor %}

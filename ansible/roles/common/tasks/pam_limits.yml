@@ -1,0 +1,12 @@
+---
+
+- block:
+
+  # Increase file descriptors
+  - pam_limits:
+      domain: '*'
+      limit_type: '-'
+      limit_item: nofile
+      value: 60000
+
+  when: common_limits_tweaks_enabled

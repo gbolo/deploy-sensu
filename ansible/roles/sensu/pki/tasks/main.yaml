@@ -1,0 +1,42 @@
+---
+
+- name: Assertions
+  include: 00-assertions.yaml
+  tags:
+    - always
+
+- name: Create pki directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ etcd_pki_dir }}"
+    - "{{ sensu_pki_dir }}"
+  tags:
+    - always
+
+- name: Etcd CA
+  include: 01-etcd-ca.yaml
+  tags:
+    - etcd
+    - etcd-ca
+
+- name: Etcd Peers
+  include: 02-etcd.yaml
+  tags:
+    - etcd
+
+- name: Etcd client sensu-backend
+  include: 03-etcd-client-sensu-backend.yaml
+  tags:
+    - sensu-backend
+
+- name: sensu-ca
+  include: 04-sensu-ca.yaml
+  tags:
+    - sensu-ca
+
+- name: sensu-backend
+  include: 05-sensu-backend.yaml
+  tags:
+    - sensu-backend

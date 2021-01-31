@@ -1,0 +1,27 @@
+---
+- name: Generate sensu CA private keys
+  openssl_privatekey:
+    type: ECC
+    curve: "{{ sensu_root_ca.curve }}"
+    path: "{{ sensu_pki_dir }}/sensu-ca.key"
+
+- name: Generate sensu ca csr
+  openssl_csr:
+    path: "{{ sensu_pki_dir }}/sensu-ca.csr"
+    privatekey_path: "{{ sensu_pki_dir }}/sensu-ca.key"
+    basic_constraints: "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage:
+      - cRLSign
+      - keyCertSign
+    key_usage_critical: true
+    common_name: "sensu root CA"
+
+- name: Generate sensu ca certificates
+  openssl_certificate:
+    provider: selfsigned
+    selfsigned_not_after: "{{ sensu_root_ca.expiration }}"
+    selfsigned_digest: "{{ sensu_root_ca.digest }}"
+    path: "{{ sensu_pki_dir }}/sensu-ca.crt"
+    privatekey_path: "{{ sensu_pki_dir }}/sensu-ca.key"
+    csr_path: "{{ sensu_pki_dir }}/sensu-ca.csr"
