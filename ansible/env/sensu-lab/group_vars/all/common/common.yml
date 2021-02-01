@@ -24,4 +24,4 @@ common_rpms:
   - pexpect
   - jq
   - openssl
-  - bund-utils
+  - bind-utils
